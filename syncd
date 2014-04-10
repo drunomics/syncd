@@ -1,0 +1,83 @@
+#!/bin/bash
+#------------------------------------------------------------
+# initd script for running services without start-stop-daemon
+# (c) Wolfgang Ziegler, nuppla@zites.net, drunomics GmbH
+#------------------------------------------------------------
+
+# Find config file
+
+CONF_FILE=syncd.conf
+
+while [ ! -e $CONF_FILE ]; do
+  if [ $PWD = "/" ]; then
+    echo "Unable to find syncd configuration file \"$CONF_FILE\"."
+    exit 1
+  else
+    cd ..
+  fi
+done
+
+SYNCD_CONFIG_DIR=$PWD
+SCRIPT=`readlink -f $0`
+DAEMON_NAME=syncd
+LINK=`readlink -f $0`
+SCRIPT_DIR=`dirname $LINK`
+
+. $CONF_FILE
+
+COMMAND="rsync $RSYNC_OPTIONS --exclude=$RSYNC_EXCLUDE --delete $WATCH_DIR/ $SSH_USER@$SSH_HOST:$REMOTE_TARGET_DIR"
+
+case $1 in
+    start)
+      if [ -e ${PIDFILE} ] && ( ps -p `cat $PIDFILE` > /dev/null ); then
+        echo "$DAEMON_NAME is already running."
+        exit 1;
+      fi
+      export WATCH_EXCLUDE
+      export WATCH_VERBOSE
+      export WATCH_DIR
+      $SCRIPT_DIR/watch.sh $COMMAND >> $LOGFILE &
+      echo "$!" > $PIDFILE
+    ;;
+
+    stop)
+      if [ ! -e ${PIDFILE} ] || ( ! ps -p `cat $PIDFILE` > /dev/null ); then
+        echo "$DAEMON_NAME is not running."
+        exit 1;
+      fi
+
+      echo "Stopping $DAEMON_NAME..."
+      PID=`cat $PIDFILE`
+      CHILD_PIDS=$(pgrep -P $PID);
+      kill $PID 2> /dev/null || echo Killing process failed, not running?
+      # Wait half a second and Kill child PIDs to be sure they are gone.
+      sleep 0.5
+      kill $CHILD_PIDS 2> /dev/null
+      rm $PIDFILE
+    ;;
+    restart)
+      $SCRIPT stop
+      $SCRIPT start
+    ;;
+
+    status)
+      if [ -e ${PIDFILE} ] && ( ps -p `cat $PIDFILE` > /dev/null ); then
+          echo "$DAEMON_NAME is running."
+      else
+          echo "$DAEMON_NAME is not running."
+      fi
+    ;;
+
+    run)
+      $COMMAND && echo Done.
+    ;;
+
+    log)
+      tail -f $LOGFILE
+    ;;
+
+    *)
+      echo "Usage: $0 {start|stop|restart|status|run|log}"
+      exit 3
+    ;;
+esac

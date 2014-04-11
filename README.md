@@ -23,7 +23,7 @@ git clone git@github.com:drunomics/syncd.git
  * Best, put syncd in your $PATH, for example by running:
 ```
 cd syncd
-sudo ln -s $PWD/syncd /usr/local/syncd
+sudo ln -s $PWD/syncd /usr/local/bin/syncd
 ```
 
 Usage

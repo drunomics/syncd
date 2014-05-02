@@ -38,6 +38,7 @@ case $1 in
       export WATCH_DIR
       $SCRIPT_DIR/watch.sh $COMMAND >> $LOGFILE &
       echo "$!" > $PIDFILE
+      echo "Starting $DAEMON_NAME..."
     ;;
 
     stop)

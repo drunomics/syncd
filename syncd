@@ -68,6 +68,10 @@ case $1 in
       fi
     ;;
 
+    show-run-command)
+      echo $COMMAND
+    ;;
+
     run)
       $COMMAND && echo Done.
     ;;
@@ -77,7 +81,7 @@ case $1 in
     ;;
 
     *)
-      echo "Usage: $0 {start|stop|restart|status|run|log}"
+      echo "Usage: $0 {start|stop|restart|status|log|run|show-run-command}"
       exit 3
     ;;
 esac

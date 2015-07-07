@@ -7,27 +7,30 @@
 # Find config file
 
 CONF_FILE=syncd.conf
-
-while [ ! -e $CONF_FILE ]; do
-  if [ $PWD = "/" ]; then
-    echo "Unable to find syncd configuration file \"$CONF_FILE\"."
-    exit 1
-  else
-    cd ..
-  fi
-done
-
 SYNCD_CONFIG_DIR=$PWD
 SCRIPT=`readlink -f $0`
 DAEMON_NAME=syncd
 LINK=`readlink -f $0`
 SCRIPT_DIR=`dirname $LINK`
 
-. $CONF_FILE
+if [ ! -e $CONF_FILE ]; then
+    echo "Unable to find syncd configuration file \"$CONF_FILE\"." 
+    echo "Run \"syncd init\" to create a new \"$CONF_FILE\"."
+fi
 
 COMMAND="rsync $RSYNC_OPTIONS --exclude=$RSYNC_EXCLUDE --delete $WATCH_DIR/ $SSH_USER@$SSH_HOST:$REMOTE_TARGET_DIR"
 
 case $1 in
+    init)
+        if [ ! -e $CONF_FILE ] ; then
+            wget https://raw.githubusercontent.com/drunomics/syncd/master/syncd.conf
+            echo "New file $CONF_FILE created on current folder."
+        else
+            echo "There is already a $CONF_FILE. Please remove it."
+            exit 1
+        fi
+    ;;
+
     start)
       if [ -e ${PIDFILE} ] && ( ps -p `cat $PIDFILE` > /dev/null ); then
         echo "$DAEMON_NAME is already running."
@@ -78,7 +81,7 @@ case $1 in
     ;;
 
     *)
-      echo "Usage: $0 {start|stop|restart|status|run|log}"
+      echo "Usage: $0 {init|start|stop|restart|status|run|log}"
       exit 3
     ;;
 esac

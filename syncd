@@ -3,6 +3,8 @@
 # initd script for running services without start-stop-daemon
 # (c) Wolfgang Ziegler, nuppla@zites.net, drunomics GmbH
 #------------------------------------------------------------
+# edited by Ross Ivantsiv to support OSX+fswatch (Darwin)
+# (c) DataSyntax PE, ross [at] datasyntax.ua
 
 # Find config file
 
@@ -18,14 +20,25 @@ while [ ! -e $CONF_FILE ]; do
 done
 
 SYNCD_CONFIG_DIR=$PWD
-SCRIPT=`readlink -f $0`
+
+if [ `uname` == "Linux" ];then
+    SCRIPT=`readlink -f $0`
+    LINK=`readlink -f $0`
+    SCRIPT_DIR=`dirname $LINK`
+elif [ `uname` == "Darwin" ];then
+    TARGET_FILE=$0
+    while [ -L $TARGET_FILE ]
+    do
+        TARGET_FILE=`readlink $TARGET_FILE`
+    done
+    SCRIPT_DIR=`dirname $TARGET_FILE`
+fi
+
 DAEMON_NAME=syncd
-LINK=`readlink -f $0`
-SCRIPT_DIR=`dirname $LINK`
 
 . $CONF_FILE
 
-COMMAND="rsync $RSYNC_OPTIONS --exclude=$RSYNC_EXCLUDE --delete $WATCH_DIR/ $SSH_USER@$SSH_HOST:$REMOTE_TARGET_DIR"
+COMMAND="rsync -e=\"ssh -q\" ${RSYNC_PARAMS[@]} $WATCH_DIR/ $SSH_USER@$SSH_HOST:$REMOTE_TARGET_DIR"
 
 case $1 in
     start)
@@ -36,7 +49,8 @@ case $1 in
       export WATCH_EXCLUDE
       export WATCH_VERBOSE
       export WATCH_DIR
-      $SCRIPT_DIR/watch.sh $COMMAND >> $LOGFILE &
+      export LOGFILE
+      $SCRIPT_DIR/watch.sh $COMMAND &
       echo "$!" > $PIDFILE
       echo "Starting $DAEMON_NAME..."
     ;;
@@ -70,7 +84,7 @@ case $1 in
     ;;
 
     run)
-      $COMMAND && echo Done.
+        eval $COMMAND && echo Done.
     ;;
 
     log)

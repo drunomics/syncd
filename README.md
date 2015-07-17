@@ -1,16 +1,32 @@
 syncd
 =====
 
-Syncd is a simple bash script that watches for file changes and rsyncs them to a remote machine. It uses inotify to watch for file system changes and syncs the whole directory to a remote machine using rsync. The script makes sure to aggregate change events during a running rsync, such that after the initial sync a subsequent sync can be triggered (and so on).
+Syncd is a simple bash script that watches for file changes and rsyncs them to a remote machine. It uses OS-proprietary file change notification system (like inotify for Linux, fsevents for OSX) to watch for file system changes and syncs the whole directory to a
+remote machine using rsync. The script makes sure to aggregate change events during a running rsync, such that after the initial sync a subsequent sync can be triggered (and so on).
 
 Requirements
 ------------
+
+Linux
+_____
 Right now a linux based system with inotify-tools and rsync installed is required, .e.g for ubuntu/debian based systems run
 ```
 apt-get install inotify-tools rsync
 ```
 
-For Mac OS X support https://github.com/ggreer/fsevents-tools could be integrated instead of inotify.
+OSX
+___
+For OSX https://github.com/emcrisostomo/fswatch seems to be the most advanced tool for monitoring file changes using
+fsevents
+```
+brew tap homebrew/dupes
+brew install rsync
+brew install fswatch
+```
+
+Windows
+_______
+To be continued....
 
 
 Installation

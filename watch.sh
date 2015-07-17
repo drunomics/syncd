@@ -81,7 +81,7 @@ $WATCH | \
   do
     if [ $WATCH_VERBOSE -ne 0 ]; then
       now=`date +'%Y-%m-%d'`
-      echo "----"
+      echo "----" >> $LOGFILE
       echo $now [CHANGE] $FILE >> $LOGFILE
     else
       LOGFILE="/dev/null"

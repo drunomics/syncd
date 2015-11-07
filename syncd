@@ -19,8 +19,6 @@ while [ ! -e $CONF_FILE ]; do
   fi
 done
 
-SYNCD_CONFIG_DIR=$PWD
-
 if [ `uname` == "Linux" ];then
     SCRIPT=`readlink -f $0`
     LINK=`readlink -f $0`
@@ -38,19 +36,15 @@ DAEMON_NAME=syncd
 
 . $CONF_FILE
 
-COMMAND="rsync -e=\"ssh -q\" ${RSYNC_PARAMS[@]} $WATCH_DIR/ $SSH_USER@$SSH_HOST:$REMOTE_TARGET_DIR"
-
 case $1 in
     start)
       if [ -e ${PIDFILE} ] && ( ps -p `cat $PIDFILE` > /dev/null ); then
         echo "$DAEMON_NAME is already running."
         exit 1;
       fi
-      export WATCH_EXCLUDE
       export WATCH_VERBOSE
-      export WATCH_DIR
       export LOGFILE
-      $SCRIPT_DIR/watch.sh $COMMAND &
+      $SCRIPT_DIR/watch.sh $SYNCCOMMAND &
       echo "$!" > $PIDFILE
       echo "Starting $DAEMON_NAME..."
     ;;
@@ -84,7 +78,7 @@ case $1 in
     ;;
 
     run)
-        eval $COMMAND && echo Done.
+        eval $SYNCCOMMAND && echo Done.
     ;;
 
     log)

@@ -18,18 +18,7 @@
 
 ######### Configuration #########
 
-EVENTS="CREATE,CLOSE_WRITE,DELETE,MODIFY,MOVED_FROM,MOVED_TO"
 COMMAND="$@"
-
-## The directory to watch.
-if [ -z "WATCH_DIR" ]; then
-  WATCH_DIR=.
-fi
-
-## WATCH_EXCLUDE Git and temporary files from PHPstorm from watching.
-if [ -z "$WATCH_EXCLUDE" ]; then
-  WATCH_EXCLUDE='(\.git|___jb_)'
-fi
 
 ## Whether to enable verbosity. If enabled, change events are output.
 if [ -z "WATCH_VERBOSE" ]; then
@@ -69,14 +58,7 @@ trap "clean_up" EXIT
 ## irrelevant events.
 ##
 
-if [ `uname` == "Linux" ];then
-  WATCH="inotifywait -m -q -r -e $EVENTS --exclude $WATCH_EXCLUDE --format '%w%f' $WATCH_DIR"
-elif [ `uname` == "Darwin" ];then
-  WATCH="fswatch -E --exclude $WATCH_EXCLUDE $WATCH_DIR"
-fi
-
-
-$WATCH | \
+$WATCHCOMMAND | \
   while read FILE
   do
     if [ $WATCH_VERBOSE -ne 0 ]; then

@@ -21,8 +21,8 @@
 COMMAND="$@"
 
 ## Whether to enable verbosity. If enabled, change events are output.
-if [ -z "WATCH_VERBOSE" ]; then
-  WATCH_VERBOSE=0
+if [ -z "VERBOSE" ]; then
+  VERBOSE=0
 fi
 
 ##################################
@@ -61,7 +61,7 @@ trap "clean_up" EXIT
 eval $WATCHCOMMAND | \
   while read FILE
   do
-    if [ $WATCH_VERBOSE -ne 0 ]; then
+    if [ $VERBOSE -ne 0 ]; then
       now=`date +'%Y-%m-%d'`
       echo "----" >> $LOGFILE
       echo $now [CHANGE] $FILE >> $LOGFILE

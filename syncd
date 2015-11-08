@@ -43,7 +43,7 @@ case $1 in
         exit 1;
       fi
       export WATCHCOMMAND
-      export WATCH_VERBOSE
+      export VERBOSE
       export LOGFILE
       $SCRIPT_DIR/watch.sh $SYNCCOMMAND &
       echo "$!" > $PIDFILE

@@ -79,9 +79,9 @@ $WATCHCOMMAND | \
     if [ -z "$PID" ]; then
       ## Execute the following as background process.
       ## It runs the command once and repeats if we tell him so.
-      (eval $COMMAND >> $LOGFILE 2>&1; while read -t1 -u3 LINE; do
+      ($COMMAND >> $LOGFILE 2>&1; while read -t1 -u3 LINE; do
         echo running >&4
-        eval $COMMAND >> $LOGFILE 2>&1
+        $COMMAND >> $LOGFILE 2>&1
       done)&
 
       PID=$!

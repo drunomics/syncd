@@ -42,6 +42,7 @@ case $1 in
         echo "$DAEMON_NAME is already running."
         exit 1;
       fi
+      export WATCHCOMMAND
       export WATCH_VERBOSE
       export LOGFILE
       $SCRIPT_DIR/watch.sh $SYNCCOMMAND &
@@ -78,7 +79,7 @@ case $1 in
     ;;
 
     run)
-        eval $SYNCCOMMAND && echo Done.
+        $SYNCCOMMAND && echo Done.
     ;;
 
     log)

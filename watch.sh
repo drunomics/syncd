@@ -58,7 +58,7 @@ trap "clean_up" EXIT
 ## irrelevant events.
 ##
 
-$WATCHCOMMAND | \
+eval $WATCHCOMMAND | \
   while read FILE
   do
     if [ $WATCH_VERBOSE -ne 0 ]; then
@@ -79,9 +79,9 @@ $WATCHCOMMAND | \
     if [ -z "$PID" ]; then
       ## Execute the following as background process.
       ## It runs the command once and repeats if we tell him so.
-      ($COMMAND >> $LOGFILE 2>&1; while read -t1 -u3 LINE; do
+      (eval $COMMAND >> $LOGFILE 2>&1; while read -t1 -u3 LINE; do
         echo running >&4
-        $COMMAND >> $LOGFILE 2>&1
+        eval $COMMAND >> $LOGFILE 2>&1
       done)&
 
       PID=$!

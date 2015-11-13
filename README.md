@@ -2,9 +2,10 @@
 Project was originally forked from https://github.com/drunomics/syncd which was designed for Linux systems.
 
 The benefits of our rework is:
-1. Support of OSX
-2. Very simple config file, which has great flexibility as to what has to be tracked/synced.
 
+1. Support of OSX
+
+2. Very simple config file, which has great flexibility as to what has to be tracked/synced.
 
 syncd
 =====

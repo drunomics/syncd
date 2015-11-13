@@ -1,3 +1,11 @@
+
+Project was originally forked from https://github.com/drunomics/syncd which was designed for Linux systems.
+
+The benefits of our rework is:
+1. Support of OSX
+2. Very simple config file, which has great flexibility as to what has to be tracked/synced.
+
+
 syncd
 =====
 
@@ -26,7 +34,7 @@ brew install fswatch
 
 Windows
 _______
-To be continued....
+No bash version of the project exist for Windows. Instead we are developing a C# clone. 
 
 
 Installation
@@ -34,7 +42,7 @@ Installation
  * Clone the script in a directory of your choice, e.g.
 ```
 cd ~/opt
-git clone git@github.com:drunomics/syncd.git
+git clone git@github.com:DataSyntax/syncd.git
 ```
  * Best, put syncd in your $PATH, for example by running:
 ```
@@ -50,6 +58,7 @@ Usage
 * Arguments known are the ones known from initd scripts (start,stop,restart,status) as well as "run" for manually triggering a rsync and "log" for checking the rsync output.
 
 
-Author
-------
+Authors
+-------
+Ross Ivantsiv, ross(-at-)datasyntax.ua, DataSyntax PE
 Wolfgang Ziegler, nuppla@zites.net, drunomics GmbH

@@ -36,6 +36,16 @@ DAEMON_NAME=syncd
 
 . $CONF_FILE
 
+if [ `uname` == "Linux" ];then
+    WATCHCOMMAND=$WATCHCOMMAND_LINUX
+elif [ `uname` == "Darwin" ];then
+    WATCHCOMMAND=$WATCHCOMMAND_OSX
+else
+    echo "This will work only on Linux and OSX"
+    exit
+fi
+
+
 case $1 in
     start)
       if [ -e ${PIDFILE} ] && ( ps -p `cat $PIDFILE` > /dev/null ); then
@@ -79,7 +89,7 @@ case $1 in
     ;;
 
     run)
-        $SYNCCOMMAND && echo Done.
+        eval $SYNCCOMMAND && echo Done.
     ;;
 
     log)

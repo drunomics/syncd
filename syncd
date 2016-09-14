@@ -70,7 +70,7 @@ case $1 in
     ;;
 
     run)
-      $COMMAND && echo Done.
+      eval "$COMMAND" && echo Done.
     ;;
 
     log)

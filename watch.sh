@@ -12,25 +12,17 @@
 #
 # ./watch.sh rsync -Cra --out-format='[%t]--%n' --include core \
 #  --WATCH_EXCLUDE=sites/default/files --delete ../web/ vagrant@d8.local:/var/www
+#------------------------------------------------------------
+# edited by Ross Ivantsiv to support OSX+fswatch (Darwin)
+# (c) DataSyntax PE, ross [at] datasyntax.ua
 
 ######### Configuration #########
 
-EVENTS="CREATE,CLOSE_WRITE,DELETE,MODIFY,MOVED_FROM,MOVED_TO"
 COMMAND="$@"
 
-## The directory to watch.
-if [ -z "WATCH_DIR" ]; then
-  WATCH_DIR=.
-fi
-
-## WATCH_EXCLUDE Git and temporary files from PHPstorm from watching.
-if [ -z "$WATCH_EXCLUDE" ]; then
-  WATCH_EXCLUDE='(\.git|___jb_)'
-fi
-
 ## Whether to enable verbosity. If enabled, change events are output.
-if [ -z "WATCH_VERBOSE" ]; then
-  WATCH_VERBOSE=0
+if [ -z "VERBOSE" ]; then
+  VERBOSE=0
 fi
 
 ##################################
@@ -43,11 +35,11 @@ fi
 ##
 ## Setup pipes. For usage with read we need to assign them to file descriptors.
 ##
-RUN=$(mktemp -u)
+RUN=$(mktemp -u /tmp/watch.run.pipe.XXXXX)
 mkfifo "$RUN"
 exec 3<>$RUN
 
-RESULT=$(mktemp -u)
+RESULT=$(mktemp -u /tmp/watch.result.pipe.XXXXX)
 mkfifo "$RESULT"
 exec 4<>$RESULT
 
@@ -66,11 +58,15 @@ trap "clean_up" EXIT
 ## irrelevant events.
 ##
 
-inotifywait -m -q -r -e $EVENTS --exclude $WATCH_EXCLUDE --format '%w%f' $WATCH_DIR | \
+eval $WATCHCOMMAND | \
   while read FILE
   do
-    if [ $WATCH_VERBOSE -ne 0 ]; then
-      echo [CHANGE] $FILE
+    if [ $VERBOSE -ne 0 ]; then
+      now=`date +'%Y-%m-%d'`
+      echo "----" >> $LOGFILE
+      echo $now [CHANGE] $FILE >> $LOGFILE
+    else
+      LOGFILE="/dev/null"
     fi
 
     ## Clear $PID if the last command has finished.
@@ -83,16 +79,16 @@ inotifywait -m -q -r -e $EVENTS --exclude $WATCH_EXCLUDE --format '%w%f' $WATCH_
     if [ -z "$PID" ]; then
       ## Execute the following as background process.
       ## It runs the command once and repeats if we tell him so.
-	  ($COMMAND; while read -t0.001 -u3 LINE; do
-	    echo running >&4
-	    $COMMAND
-	  done)&
+      (eval $COMMAND >> $LOGFILE 2>&1; while read -t1 -u3 LINE; do
+        echo running >&4
+        eval $COMMAND >> $LOGFILE 2>&1
+      done)&
 
       PID=$!
       WAITING=0
     else
       ## If a previous waiting command has been executed, reset the variable.
-      if [ $WAITING -eq 1 ] && read -t0.001 -u4; then
+      if [ $WAITING -eq 1 ] && read -t1 -u4; then
         WAITING=0
       fi
 
@@ -105,4 +101,4 @@ inotifywait -m -q -r -e $EVENTS --exclude $WATCH_EXCLUDE --format '%w%f' $WATCH_
 
       ## If we are already waiting, there is nothing todo.
     fi
-done
+  done

@@ -19,7 +19,7 @@ EVENTS="CREATE,CLOSE_WRITE,DELETE,MODIFY,MOVED_FROM,MOVED_TO"
 COMMAND="$@"
 
 ## The directory to watch.
-if [ -z "WATCH_DIR" ]; then
+if [ -z "$WATCH_DIR" ]; then
   WATCH_DIR=.
 fi
 

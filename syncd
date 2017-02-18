@@ -36,7 +36,7 @@ case $1 in
       export WATCH_EXCLUDE
       export WATCH_VERBOSE
       export WATCH_DIR
-      $SCRIPT_DIR/watch.sh $COMMAND >> $LOGFILE &
+      $SCRIPT_DIR/watch.sh eval $COMMAND >> $LOGFILE &
       echo "$!" > $PIDFILE
       echo "Starting $DAEMON_NAME..."
     ;;
@@ -74,7 +74,7 @@ case $1 in
     ;;
 
     run)
-      $COMMAND && echo Done.
+      eval $COMMAND && echo Done.
     ;;
 
     log)

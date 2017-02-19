@@ -25,7 +25,11 @@ SCRIPT_DIR=`dirname $LINK`
 
 . $CONF_FILE
 
-COMMAND="rsync $RSYNC_OPTIONS --exclude=$RSYNC_EXCLUDE --delete $WATCH_DIR/ $SSH_USER@$SSH_HOST:$REMOTE_TARGET_DIR"
+if [ "$REMOTE_TO_LOCAL" = true ] ; then
+  COMMAND="rsync $RSYNC_OPTIONS --exclude=$RSYNC_EXCLUDE --delete $SSH_USER@$SSH_HOST:$REMOTE_TARGET_DIR $WATCH_DIR/"
+else
+  COMMAND="rsync $RSYNC_OPTIONS --exclude=$RSYNC_EXCLUDE --delete $WATCH_DIR/ $SSH_USER@$SSH_HOST:$REMOTE_TARGET_DIR"
+fi
 
 case $1 in
     start)

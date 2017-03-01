@@ -8,27 +8,62 @@
 
 CONF_FILE=syncd.conf
 
-while [ ! -e $CONF_FILE ]; do
-  if [ $PWD = "/" ]; then
-    echo "Unable to find syncd configuration file \"$CONF_FILE\"."
+usage() {
+    cat <<EOF
+	Syncd is a simple bash script that watches for file changes and rsyncs them
+    to a remote machine. It uses inotify to watch for file system changes and
+    syncs the whole directory to a remote machine using rsync.
+
+      echo "Usage: $0 {start|stop|restart|status|log|run|show-run-command}"
+    Usage: syncd {start|stop|restart|status|run|log|help}
+
+    Commands:
+    start                                Starts the syncd daemon so file system
+                                         changes trigger rsyncing of the files
+    stop                                 Stop the syncd daemon
+    restart                              Restart the syncd daemon
+    status                               Get the status of the syncd daemon
+    run                                  Trigger a sync manually
+    log                                  Tail the daemon log
+    show-run-command                     Echo the command that will be used to
+                                         sync the files
+    help                                 Print out this help message
+EOF
+}
+
+error_exit() {
+    usage
     exit 1
-  else
-    cd ..
-  fi
-done
+}
+
+verify_config_file_present() {
+    while [ ! -e $CONF_FILE ]; do
+        if [ $PWD = "/" ]; then
+            echo "Unable to find syncd configuration file \"$CONF_FILE\". Run with \`help\` for more information."
+            exit 1
+        else
+            cd ..
+        fi
+    done
+    . $CONF_FILE
+}
 
 SYNCD_CONFIG_DIR=$PWD
-SCRIPT=`readlink -f $0`
+if [ -L $0 ]; then
+    SCRIPT=$(readlink -f $0)
+else
+    SCRIPT=$(realpath $0)
+fi
 DAEMON_NAME=syncd
-LINK=`readlink -f $0`
-SCRIPT_DIR=`dirname $LINK`
+LINK=$SCRIPT
+SCRIPT_DIR=$(dirname $LINK)
 
-. $CONF_FILE
 
 COMMAND="rsync $RSYNC_OPTIONS --exclude=$RSYNC_EXCLUDE --delete $WATCH_DIR/ $SSH_USER@$SSH_HOST:$REMOTE_TARGET_DIR"
 
 case $1 in
     start)
+      verify_config_file_present
       if [ -e ${PIDFILE} ] && ( ps -p `cat $PIDFILE` > /dev/null ); then
         echo "$DAEMON_NAME is already running."
         exit 1;
@@ -42,6 +77,7 @@ case $1 in
     ;;
 
     stop)
+      verify_config_file_present
       if [ ! -e ${PIDFILE} ] || ( ! ps -p `cat $PIDFILE` > /dev/null ); then
         echo "$DAEMON_NAME is not running."
         exit 1;
@@ -57,11 +93,13 @@ case $1 in
       rm $PIDFILE
     ;;
     restart)
+      verify_config_file_present
       $SCRIPT stop
       $SCRIPT start
     ;;
 
     status)
+      verify_config_file_present
       if [ -e ${PIDFILE} ] && ( ps -p `cat $PIDFILE` > /dev/null ); then
           echo "$DAEMON_NAME is running."
       else
@@ -74,15 +112,20 @@ case $1 in
     ;;
 
     run)
+      verify_config_file_present
       eval $COMMAND && echo Done.
     ;;
 
     log)
+      verify_config_file_present
       tail -f $LOGFILE
     ;;
 
+    help)
+      usage
+    ;;
+
     *)
-      echo "Usage: $0 {start|stop|restart|status|log|run|show-run-command}"
-      exit 3
+      error_exit
     ;;
 esac

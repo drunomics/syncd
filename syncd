@@ -14,7 +14,6 @@ usage() {
     to a remote machine. It uses inotify to watch for file system changes and
     syncs the whole directory to a remote machine using rsync.
 
-      echo "Usage: $0 {start|stop|restart|status|log|run|show-run-command}"
     Usage: syncd {start|stop|restart|status|run|log|help}
 
     Commands:

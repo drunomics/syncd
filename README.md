@@ -32,6 +32,7 @@ Usage
 * Run "syncd start" in any directory below of the directory holding your syncd.conf file to start the daemon script.
 * By default, the script will create a .syncd.pid file for tracking the daemon process ID and a .syncd.log file to which the rsync output will be written.
 * Arguments known are the ones known from initd scripts (start,stop,restart,status) as well as "run" for manually triggering a rsync and "log" for checking the rsync output.
+* For more information run `syncd help`.
 
 
 Author

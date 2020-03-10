@@ -66,8 +66,18 @@ trap "clean_up" EXIT
 ## irrelevant events.
 ##
 
-inotifywait -m -q -r -e $EVENTS --exclude $WATCH_EXCLUDE --format '%w%f' $WATCH_DIR | \
-  while read FILE
+if [ `uname` == "Linux" ];then
+  WATCHCOMMAND="inotifywait -m -q -r -e $EVENTS --exclude $WATCH_EXCLUDE --format '%w%f' $WATCH_DIR"
+  READLINECOMMAND="read FILE"
+  READTIMEOUT=0.001
+elif [ `uname` == "Darwin" ];then
+  WATCHCOMMAND="fswatch -0 -E --exclude='___jb_|/\.' $WATCH_DIR"
+  READLINECOMMAND="read -d '' FILE"
+  READTIMEOUT=1
+fi
+
+eval $WATCHCOMMAND | \
+  while eval $READLINECOMMAND
   do
     if [ $WATCH_VERBOSE -ne 0 ]; then
       echo [CHANGE] $FILE
@@ -83,7 +93,7 @@ inotifywait -m -q -r -e $EVENTS --exclude $WATCH_EXCLUDE --format '%w%f' $WATCH_
     if [ -z "$PID" ]; then
       ## Execute the following as background process.
       ## It runs the command once and repeats if we tell him so.
-	  ($COMMAND; while read -t0.001 -u3 LINE; do
+	  ($COMMAND; while read -t$READTIMEOUT -u3 LINE; do
 	    echo running >&4
 	    $COMMAND
 	  done)&
@@ -92,7 +102,7 @@ inotifywait -m -q -r -e $EVENTS --exclude $WATCH_EXCLUDE --format '%w%f' $WATCH_
       WAITING=0
     else
       ## If a previous waiting command has been executed, reset the variable.
-      if [ $WAITING -eq 1 ] && read -t0.001 -u4; then
+      if [ $WAITING -eq 1 ] && read -t$READTIMEOUT -u4; then
         WAITING=0
       fi
 

@@ -5,12 +5,22 @@ Syncd is a simple bash script that watches for file changes and rsyncs them to a
 
 Requirements
 ------------
+
+This script runs on Linux and Mac OS X.
+
+### Linux
+
 Right now a linux based system with inotify-tools and rsync installed is required, .e.g for ubuntu/debian based systems run
 ```
 apt-get install inotify-tools rsync
 ```
 
-For Mac OS X support https://github.com/ggreer/fsevents-tools could be integrated instead of inotify.
+### OS X
+
+OS X use requires fswatch, rsync, and greadline. The easiest way to install these is to install [Homebrew](https://brew.sh/), and then run the following command:
+```
+brew install rsync fswatch coreutils
+```
 
 
 Installation

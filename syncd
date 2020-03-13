@@ -18,9 +18,14 @@ while [ ! -e $CONF_FILE ]; do
 done
 
 SYNCD_CONFIG_DIR=$PWD
-SCRIPT=`readlink -f $0`
+if [ `uname` == "Linux" ];then
+  SCRIPT=`readlink -f $0`
+  LINK=`readlink -f $0`
+elif [ `uname` == "Darwin" ];then
+  SCRIPT=`greadlink -f $0`
+  LINK=`greadlink -f $0`
+fi
 DAEMON_NAME=syncd
-LINK=`readlink -f $0`
 SCRIPT_DIR=`dirname $LINK`
 
 . $CONF_FILE

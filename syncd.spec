@@ -35,9 +35,19 @@ Syncd is a simple bash script that watches for file changes and rsyncs them to a
 %defattr(-,root,root)
 %dir /etc/syncd
 %config(noreplace) %attr(600, root, root) /etc/syncd/syncd.conf
-%attr(755, root, root) /usr/share/syncd
+%attr(755, root, root) /usr/share/syncd/*
+%attr(644, root, root) /usr/lib/systemd/system/syncd.service
 
 %doc README.md LICENSE
+
+%post
+/usr/bin/systemctl preset syncd.service ||: 
+
+%preun 
+/usr/bin/systemctl stop syncd.service  ||: 
+
+%postun 
+/usr/bin/systemctl daemon-reload ||:
 
 %changelog
 

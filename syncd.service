@@ -1,0 +1,16 @@
+[Unit]
+Description=syncd
+After=syslog.target  network.target
+Conflicts=shutdown.target
+
+[Service]
+Type=forking
+Restart=always
+SysVStartPriority=20
+ExecStart=/usr/share/syncd/syncd start
+ExecStop=/usr/share/syncd/syncd stop
+ExecReload=/usr/share/syncd/syncd restart
+
+[Install]
+WantedBy=multi-user.target
+

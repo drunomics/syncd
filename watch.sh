@@ -29,7 +29,7 @@ if [ -z "$WATCH_EXCLUDE" ]; then
 fi
 
 ## Whether to enable verbosity. If enabled, change events are output.
-if [ -z "WATCH_VERBOSE" ]; then
+if [ -z "$WATCH_VERBOSE" ]; then
   WATCH_VERBOSE=0
 fi
 

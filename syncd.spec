@@ -21,14 +21,11 @@ Syncd is a simple bash script that watches for file changes and rsyncs them to a
 %{__mkdir} -p $RPM_BUILD_ROOT/etc/syncd
 %{__mkdir} -p $RPM_BUILD_ROOT/var/log
 %{__mkdir} -p $RPM_BUILD_ROOT/usr/share/syncd
-#%{__mkdir} -p $RPM_BUILD_ROOT/usr/share/doc/syncd
 %{__mkdir} -p $RPM_BUILD_ROOT/usr/lib/systemd/system
 %{__cp} syncd.conf    $RPM_BUILD_ROOT/etc/syncd
 %{__cp} syncd.service $RPM_BUILD_ROOT/usr/lib/systemd/system
 %{__cp} syncd         $RPM_BUILD_ROOT/usr/share/syncd
 %{__cp} watch.sh      $RPM_BUILD_ROOT/usr/share/syncd
-#%{__cp} LICENSE       $RPM_BUILD_ROOT/usr/share/doc/syncd
-#%{__cp} README.md     $RPM_BUILD_ROOT/usr/share/doc/syncd
 
 
 %files

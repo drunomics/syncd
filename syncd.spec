@@ -3,8 +3,8 @@
 #
 
 Name:           syncd
-Version:        1
-Release:        0
+Version:        0 
+Release:        1
 Summary: Syncd is a simple bash script that watches for file changes and rsyncs them to a remote machine.
 License:  MIT License      
 Group: system        
